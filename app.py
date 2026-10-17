@@ -1,7 +1,7 @@
 
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
-
+from datetime import datetime
 # ==========================================
 # CONFIGURAÇÃO DA APLICAÇÃO
 # ==========================================
@@ -24,8 +24,9 @@ class Contato(db.Model):
     email = db.Column(db.String(120), nullable=True)
     telefone = db.Column(db.String(20), nullable=True)
 
-    # Permite acessar as tarefas associadas a este contato.
-    tarefas = db.relationship('Tarefa', backref='responsavel', lazy=True)
+    # Permite acessar as tarefas associadas a este contato (cascade remove tarefas se o contato for apagado).
+    tarefas = db.relationship('Tarefa', backref='responsavel', lazy=True, cascade="all, delete-orphan")
+    
 
     def __repr__(self):
         return f'<Contato {self.nome}>'
@@ -59,15 +60,17 @@ class Tarefa(db.Model):
 
 
 # ==========================================
-# ROTA INICIAL
+# T22: LISTAGEM DE TAREFAS (ROTA INICIAL)
 # ==========================================
 @app.route('/')
 def index():
-    return "API do To-Do List rodando com sucesso! Banco configurado."
+    # Consulta todas as tarefas no banco de dados e envia para o HTML
+     lista_tarefas = Tarefa.query.all()
+     return render_template('index.html', tarefas=lista_tarefas)
 
 
 # ==========================================
-# T12: ROTAS DE CONTATOS (CRIAR E LISTAR)
+# T18 & T19: ROTAS DE CONTATOS (CRIAR E LISTAR)
 # ==========================================
 @app.route('/contatos', methods=['GET', 'POST'])
 def contatos():
@@ -114,6 +117,75 @@ def contatos():
         contatos=lista_contatos
     )
 
+# ==========================================
+# T20: EXCLUSÃO DE CONTATOS
+# ==========================================
+@app.route('/excluir_contato/<int:id>')
+def excluir_contato(id):
+    contato = Contato.query.get_or_404(id)
+    try:
+        db.session.delete(contato)
+        db.session.commit()
+        flash('Contato excluído com sucesso!', 'success')
+    except Exception:
+        db.session.rollback()
+        flash('Erro ao excluir contato.', 'danger')
+    return redirect(url_for('contatos'))
+
+# ==========================================
+# T21: CADASTRO DE TAREFAS
+# ==========================================
+@app.route('/nova_tarefa', methods=['GET', 'POST'])
+def nova_tarefa():
+    if request.method == 'POST':
+        descricao = request.form.get('descricao', '').strip()
+        prazo_str = request.form.get('prazo')
+        prioridade = request.form.get('prioridade')
+        status = request.form.get('status')
+        contato_id = request.form.get('contato_id')
+
+        if not descricao or not contato_id or not prazo_str:
+            flash('Descrição, prazo e responsável são obrigatórios!', 'danger')
+            return redirect(url_for('nova_tarefa'))
+
+        try:
+            # Converte a data que vem do HTML em texto (YYYY-MM-DD) para um formato de Data do Python
+            prazo_date = datetime.strptime(prazo_str, '%Y-%m-%d').date()
+
+            nova_tarefa = Tarefa(
+                descricao=descricao,
+                prazo=prazo_date,
+                prioridade=prioridade,
+                status=status,
+                contato_id=int(contato_id)
+            )
+            db.session.add(nova_tarefa)
+            db.session.commit()
+            flash('Tarefa cadastrada com sucesso!', 'success')
+            return redirect(url_for('index'))
+        except Exception as e:
+            db.session.rollback()
+            app.logger.exception('Erro ao cadastrar tarefa')
+            flash('Erro ao salvar a tarefa no banco de dados.', 'danger')
+            return redirect(url_for('nova_tarefa'))
+
+    # Para a página carregar, buscamos os contatos para o usuário poder escolher o responsável
+    lista_contatos = Contato.query.all()
+    return render_template('nova_tarefa.html', contatos=lista_contatos)
+# ==========================================
+# T23: EXCLUSÃO DE TAREFAS
+# ==========================================
+@app.route('/excluir_tarefa/<int:id>')
+def excluir_tarefa(id):
+    tarefa = Tarefa.query.get_or_404(id)
+    try:
+        db.session.delete(tarefa)
+        db.session.commit()
+        flash('Tarefa excluída com sucesso!', 'success')
+    except Exception:
+        db.session.rollback()
+        flash('Erro ao excluir tarefa.', 'danger')
+    return redirect(url_for('index'))
 
 # ==========================================
 # INICIALIZAÇÃO DA APLICAÇÃO
