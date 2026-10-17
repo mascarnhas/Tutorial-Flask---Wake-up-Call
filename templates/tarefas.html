@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
 {% block title %}Gerenciar Tarefas - Task Manager{% endblock %}
 {% block content %}
-{% from '_macros.html' import badge_status, data_br %}
+{% from '_macros.html' import
+    badge_status, classe_linha, classe_descricao, classe_prazo,
+    prioridade_texto, data_br, indicador_prazo, estilo_excluir %}
 
 <h1 class="h3 mb-4">Tarefas</h1>
+
 <div class="card shadow-sm mb-4">
     <div class="card-header fw-semibold">Nova tarefa</div>
     <div class="card-body">
@@ -16,7 +19,6 @@
         </form>
     </div>
 </div>
-
 <div class="card shadow-sm">
     <div class="card-header fw-semibold">Tarefas cadastradas</div>
     <div class="table-responsive">
@@ -35,22 +37,37 @@
             <tbody>
                 {% for tarefa in tarefas %}
                 {% set nome_responsavel = tarefa.responsavel.nome if tarefa.responsavel else '-' %}
-                <tr>
+                <tr class="{{ classe_linha(tarefa.status) }}">
                     <td class="d-none d-md-table-cell text-muted">{{ tarefa.id }}</td>
                     <td>
-                        <span class="fw-semibold text-break">{{ tarefa.descricao }}</span>
+                        <span class="fw-semibold text-break {{ classe_descricao(tarefa.status) }}">{{ tarefa.descricao }}</span>
                         <div class="d-md-none small text-muted mt-1">
                             <div class="mb-1">{{ badge_status(tarefa.status) }}</div>
                             <div>Responsável: {{ nome_responsavel }}</div>
-                            <div>Prazo: {{ data_br(tarefa.prazo) }}</div>
-                            <div>Prioridade: {{ tarefa.prioridade }}</div>
+                            <div>Prazo: <span class="{{ classe_prazo(tarefa.status) }}">{{ data_br(tarefa.prazo) }}</span></div>
+                            {{ indicador_prazo(tarefa.prazo, tarefa.status, hoje) }}
+                            <div>Prioridade: {{ prioridade_texto(tarefa.prioridade) }}</div>
                         </div>
                     </td>
                     <td class="d-none d-md-table-cell">{{ nome_responsavel }}</td>
-                    <td class="d-none d-md-table-cell text-nowrap">{{ data_br(tarefa.prazo) }}</td>
-                    <td class="d-none d-md-table-cell">{{ tarefa.prioridade }}</td>
+                    <td class="d-none d-md-table-cell text-nowrap">
+                        <span class="{{ classe_prazo(tarefa.status) }}">{{ data_br(tarefa.prazo) }}</span>
+                        {{ indicador_prazo(tarefa.prazo, tarefa.status, hoje) }}
+                    </td>
+                    <td class="d-none d-md-table-cell">{{ prioridade_texto(tarefa.prioridade) }}</td>
                     <td class="d-none d-md-table-cell">{{ badge_status(tarefa.status) }}</td>
                     <td class="text-end text-nowrap">
+                        <div class="d-inline-flex flex-column flex-md-row gap-1">
+                            <a href="/tarefas/{{ tarefa.id }}/editar" class="btn btn-outline-dark btn-sm"
+                               aria-label="Editar tarefa {{ tarefa.descricao }}">Editar</a>
+
+                            <form method="POST" action="/tarefas/{{ tarefa.id }}/excluir" class="d-flex"
+                                  onsubmit='return confirm({{ ("Excluir a tarefa “" ~ (tarefa.descricao | truncate(60)) ~ "”? Essa ação não pode ser desfeita.") | tojson }});'>
+                                <button type="submit" class="btn btn-outline-danger btn-sm flex-fill"
+                                        style="{{ estilo_excluir(tarefa.status) }}"
+                                        aria-label="Excluir tarefa {{ tarefa.descricao }}">Excluir</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 {% else %}
