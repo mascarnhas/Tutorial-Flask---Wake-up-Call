@@ -1,0 +1,16 @@
+{% macro badge_status(status) -%}
+    {%- set cores = {
+        'A fazer':   'text-bg-secondary',
+        'Fazendo':   'text-bg-warning',
+        'Concluída': 'text-bg-success',
+        'Atrasada':  'text-bg-danger'
+    } -%}
+    <span class="badge {{ cores.get(status, 'text-bg-light border') }}">{{ status }}</span>
+{%- endmacro %}
+
+{% macro data_br(data) -%}
+    {%- if not data -%}-
+    {%- elif data.strftime is defined -%}{{ data.strftime('%d/%m/%Y') }}
+    {%- else -%}{{ data }}
+    {%- endif -%}
+{%- endmacro %}
