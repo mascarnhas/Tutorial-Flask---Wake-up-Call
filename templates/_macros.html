@@ -1,16 +1,53 @@
-{% macro badge_status(status) -%}
-    {%- set cores = {
+{% macro cor_status(status) -%}
+    {{- {
         'A fazer':   'text-bg-secondary',
         'Fazendo':   'text-bg-warning',
         'Concluída': 'text-bg-success',
         'Atrasada':  'text-bg-danger'
-    } -%}
-    <span class="badge {{ cores.get(status, 'text-bg-light border') }}">{{ status }}</span>
+    }.get(status, 'text-bg-light border') -}}
+{%- endmacro %}
+
+{% macro badge_status(status) -%}
+    <span class="badge {{ cor_status(status) }}">{{ status }}</span>
+{%- endmacro %}
+{% macro classe_linha(status) -%}
+    {{ 'table-danger' if status == 'Atrasada' }}
+{%- endmacro %}
+
+{% macro classe_descricao(status) -%}
+    {{ 'text-decoration-line-through text-muted' if status == 'Concluída' }}
+{%- endmacro %}
+
+{% macro classe_prazo(status) -%}
+    {{ 'text-danger-emphasis fw-semibold' if status == 'Atrasada' }}
+{%- endmacro %}
+
+{% macro estilo_excluir(status) -%}
+    {{ '--bs-btn-color: var(--bs-danger-text-emphasis); --bs-btn-border-color: var(--bs-danger-text-emphasis);' if status == 'Atrasada' }}
+{%- endmacro %}
+
+{% macro prioridade_texto(prioridade) -%}
+    {%- if prioridade == 'Alta' -%}<span class="fw-bold">Alta</span>
+    {%- elif prioridade == 'Baixa' -%}<span class="text-muted">Baixa</span>
+    {%- else -%}{{ prioridade or '-' }}
+    {%- endif -%}
 {%- endmacro %}
 
 {% macro data_br(data) -%}
     {%- if not data -%}-
     {%- elif data.strftime is defined -%}{{ data.strftime('%d/%m/%Y') }}
     {%- else -%}{{ data }}
+    {%- endif -%}
+{%- endmacro %}
+{% macro indicador_prazo(prazo, status, hoje) -%}
+    {%- if prazo and hoje and prazo.toordinal is defined and hoje.toordinal is defined and status != 'Concluída' -%}
+        {%- set dias = prazo.toordinal() - hoje.toordinal() -%}
+        {%- if dias < 0 -%}
+            <div class="small text-danger-emphasis">Venceu há {{ -dias }} {{ 'dia' if dias == -1 else 'dias' }}</div>
+        {%- elif dias == 0 -%}
+            <div class="small fw-semibold text-warning-emphasis">Vence hoje</div>
+        {%- elif dias == 1 -%}
+            <div class="small text-warning-emphasis">Vence amanhã</div>
+        {%- endif -%}
     {%- endif -%}
 {%- endmacro %}
