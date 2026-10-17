@@ -1,10 +1,7 @@
 {% extends 'base.html' %}
-
 {% block title %}Gerenciar Contatos - Task Manager{% endblock %}
-
 {% block content %}
 <h1 class="h3 mb-4">Contatos</h1>
-
 <div class="row g-4">
     <div class="col-lg-4">
         <div class="card shadow-sm">
@@ -32,7 +29,6 @@
             </div>
         </div>
     </div>
-
     <div class="col-lg-8">
         <div class="card shadow-sm">
             <div class="card-header fw-semibold">Contatos cadastrados</div>
@@ -53,7 +49,6 @@
                             <td class="d-none d-md-table-cell text-muted">{{ contato.id }}</td>
                             <td class="fw-semibold">
                                 {{ contato.nome }}
-
                                 <div class="d-md-none fw-normal small text-muted text-break">
                                     {{ contato.email or '-' }}<br>{{ contato.telefone or '-' }}
                                 </div>
@@ -61,6 +56,11 @@
                             <td class="d-none d-md-table-cell text-break">{{ contato.email or '-' }}</td>
                             <td class="d-none d-md-table-cell text-nowrap">{{ contato.telefone or '-' }}</td>
                             <td class="text-end text-nowrap">
+                                <form method="POST" action="/contatos/{{ contato.id }}/excluir" class="d-inline"
+                                      onsubmit='return confirm({{ ("Excluir o contato " ~ contato.nome ~ "? Essa ação não pode ser desfeita.") | tojson }});'>
+                                    <button type="submit" class="btn btn-outline-danger btn-sm"
+                                            aria-label="Excluir contato {{ contato.nome }}">Excluir</button>
+                                </form>
                             </td>
                         </tr>
                         {% else %}
