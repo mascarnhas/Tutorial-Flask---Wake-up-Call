@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - Task Manager{% endblock %}
+{% block content %}
+{% from '_macros.html' import cor_status %}
+
+{% set ordem = ['A fazer', 'Fazendo', 'Concluída', 'Atrasada'] %}
+{% set dados = contagem or {} %}
+{% set total = dados.values() | sum %}
+
+<div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-4">
+    <h1 class="h3 mb-0">Dashboard</h1>
+    <span class="text-muted">Total: <strong>{{ total }}</strong> {{ 'tarefa' if total == 1 else 'tarefas' }}</span>
+</div>
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+    {% for status in ordem %}
+    {% set quantidade = dados.get(status, 0) %}
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm {{ cor_status(status) }}">
+            <div class="card-body">
+                <h2 class="h6 card-title mb-2">{{ status }}</h2>
+                <p class="display-4 fw-bold lh-1 mb-1">{{ quantidade }}</p>
+                <p class="small mb-0">{{ 'tarefa' if quantidade == 1 else 'tarefas' }}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if total == 0 %}
+<p class="text-muted mt-4 mb-0">
+    Nenhuma tarefa cadastrada ainda. <a href="/tarefas">Cadastre a primeira tarefa</a>.
+</p>
+{% endif %}
+{% endblock %}
