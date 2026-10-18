@@ -13,6 +13,38 @@ Aplicação web de gerenciamento de tarefas desenvolvida em Python com Flask e S
 - **Identificação de atrasos:** destacar automaticamente tarefas com prazo vencido que ainda não foram concluídas.
 - **Dashboard:** visualizar a quantidade de tarefas por status.
 
+## Regras de funcionamento
+
+- **Status selecionáveis:** `A fazer`, `Fazendo` e `Concluída`.
+- **Atraso automático:** uma tarefa não concluída cujo prazo já passou é exibida como `Atrasada`. Esse estado é calculado pela aplicação, não selecionado manualmente.
+- **Identificação visual:** cada status possui uma cor própria: cinza para tarefas a fazer, amarelo para tarefas em andamento, verde para concluídas e vermelho para atrasadas.
+- **Prazos:** a aplicação destaca tarefas que vencem hoje, amanhã ou que já venceram.
+- **Exclusão segura:** a exclusão de tarefas e contatos utiliza requisições POST. Contatos vinculados a tarefas não podem ser excluídos.
+- **Responsáveis:** cada tarefa é vinculada a um contato cadastrado.
+
+## Testes e validações
+
+Durante a validação do protótipo, foram verificados:
+
+- Acesso às páginas de contatos, tarefas e dashboard.
+- Cadastro, edição e exclusão de contatos e tarefas.
+- Validação de campos obrigatórios e dados inválidos.
+- Associação entre tarefas e contatos.
+- Cálculo e apresentação de tarefas atrasadas.
+- Proteção contra exclusão de contatos vinculados a tarefas.
+- Respostas adequadas para operações de exclusão inválidas.
+- Sintaxe do arquivo Python e consistência das dependências.
+
+Os testes funcionais foram executados em uma cópia temporária do projeto para evitar alterações no banco de dados original.
+
+## Colaboração e controle de versão
+
+- A branch `main` representa a versão principal do repositório.
+- A branch `dev` é utilizada para integrar e validar as funcionalidades antes da entrega.
+- As alterações devem ser registradas em commits pequenos, com mensagens descritivas.
+- Antes da integração final, o código e os requisitos da atividade devem ser revisados.
+- Alterações feitas por integrantes diferentes devem ser integradas e verificadas para evitar regressões.
+
 ## Tecnologias
 
 - Python 3
