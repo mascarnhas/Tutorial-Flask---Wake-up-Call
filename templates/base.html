@@ -4,39 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Task Manager{% endblock %}</title>
-    <!-- CSS do Bootstrap 5 via CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <!-- Barra de Navegação Superior (Navbar) -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-        <div class="container">
+{% macro item_menu(endereco, texto) %}
+    {% set ativo = request.path.startswith(endereco) %}
+    <a class="nav-link{% if ativo %} active{% endif %}" href="{{ endereco }}"{% if ativo %} aria-current="page"{% endif %}>{{ texto }}</a>
+{% endmacro %}
+
+{% set cores_alerta = {
+    'success': 'success', 'sucesso': 'success',
+    'danger': 'danger',   'erro': 'danger',
+    'warning': 'warning', 'aviso': 'warning',
+    'info': 'info'
+} %}
+
+<body class="bg-body-tertiary">
+    <nav class="navbar navbar-expand navbar-dark bg-dark mb-4">
+        <div class="container flex-wrap">
             <a class="navbar-brand fw-bold" href="/">Task Manager</a>
-            <div class="navbar-nav">
-                <a class="nav-link active" href="/contatos">Contatos</a>
+            <div class="navbar-nav ms-sm-auto">
+                {{ item_menu('/dashboard', 'Dashboard') }}
+                {{ item_menu('/tarefas', 'Tarefas') }}
+                {{ item_menu('/contatos', 'Contatos') }}
             </div>
         </div>
     </nav>
 
-    <!-- Conteúdo Principal -->
-    <div class="container">
-        <!-- Bloco para Exibição de Mensagens Flash (Alertas de sucesso/erro) -->
+    <main class="container pb-5">
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ cores_alerta.get(category, 'secondary') }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                </div>
+            {% endfor %}
         {% endwith %}
-
-        <!-- Bloco dinâmico onde as outras páginas inserem seu conteúdo -->
         {% block content %}{% endblock %}
-    </div>
-
-    <!-- JS do Bootstrap 5 via CDN (para fechar alertas e interatividades) -->
+    </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

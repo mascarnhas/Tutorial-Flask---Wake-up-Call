@@ -1,70 +1,113 @@
 {% extends 'base.html' %}
-
 {% block title %}Gerenciar Contatos - Task Manager{% endblock %}
-
 {% block content %}
-<div class="row">
-    <!-- Form de Cadastro de Contatos -->
-    <div class="col-md-5 mb-4">
+<h1 class="h3 mb-4">Contatos</h1>
+
+<div class="row g-4">
+    <div class="col-lg-4">
         <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Novo Contato</h5>
-            </div>
+            <div class="card-header fw-semibold">Novo contato</div>
             <div class="card-body">
                 <form method="POST" action="{{ url_for('contatos') }}">
                     <div class="mb-3">
-                        <label for="nome" class="form-label">Nome *</label>
-                        <input type="text" class="form-control" id="nome" name="nome" placeholder="Ex: João Silva" required>
+                        <label for="nome" class="form-label">Nome <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="nome" name="nome"
+                               placeholder="Ex: João Silva" autocomplete="name" required>
                     </div>
+
                     <div class="mb-3">
                         <label for="email" class="form-label">E-mail</label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="joao@email.com">
+                        <input type="email" class="form-control" id="email" name="email"
+                               placeholder="joao@email.com" autocomplete="email">
                     </div>
+
                     <div class="mb-3">
                         <label for="telefone" class="form-label">Telefone</label>
-                        <input type="text" class="form-control" id="telefone" name="telefone" placeholder="(11) 99999-9999">
+                        <input type="tel" class="form-control" id="telefone" name="telefone"
+                               placeholder="(11) 99999-9999" autocomplete="tel">
                     </div>
-                    <button type="submit" class="btn btn-success w-100">Salvar Contato</button>
+
+                    <div class="form-text mb-3">
+                        <span class="text-danger">*</span> Campo obrigatório
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">
+                        Salvar Contato
+                    </button>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Tabela de Listagem de Contatos -->
-    <div class="col-md-7">
+    <div class="col-lg-8">
         <div class="card shadow-sm">
-            <div class="card-header bg-secondary text-white">
-                <h5 class="mb-0">Contatos Cadastrados</h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>ID</th>
-                                <th>Nome</th>
-                                <th>E-mail</th>
-                                <th>Telefone</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for contato in contatos %}
-                            <tr>
-                                <td>{{ contato.id }}</td>
-                                <td><strong>{{ contato.nome }}</strong></td>
-                                <td>{{ contato.email or '-' }}</td>
-                                <td>{{ contato.telefone or '-' }}</td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="4" class="text-center text-muted py-3">
-                                    Nenhum contato cadastrado no momento.
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+            <div class="card-header fw-semibold">Contatos cadastrados</div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="d-none d-md-table-cell">ID</th>
+                            <th scope="col">Nome</th>
+                            <th scope="col" class="d-none d-md-table-cell">E-mail</th>
+                            <th scope="col" class="d-none d-md-table-cell">Telefone</th>
+                            <th scope="col" class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for contato in contatos %}
+                        <tr>
+                            <td class="d-none d-md-table-cell text-muted">
+                                {{ contato.id }}
+                            </td>
+
+                            <td class="fw-semibold">
+                                {{ contato.nome }}
+                                <div class="d-md-none fw-normal small text-muted text-break">
+                                    {{ contato.email or '-' }}<br>
+                                    {{ contato.telefone or '-' }}
+                                </div>
+                            </td>
+
+                            <td class="d-none d-md-table-cell text-break">
+                                {{ contato.email or '-' }}
+                            </td>
+
+                            <td class="d-none d-md-table-cell text-nowrap">
+                                {{ contato.telefone or '-' }}
+                            </td>
+
+                            <td class="text-end text-nowrap">
+                                <!-- CORREÇÃO 1:
+                                     A confirmação usa uma mensagem fixa.
+                                     Isso evita o diagnóstico de JavaScript
+                                     provocado pela expressão Jinja no onsubmit. -->
+
+                                <!-- CORREÇÃO 2:
+                                     A rota recebe o argumento id, conforme
+                                     indicado pelo erro do Flask. -->
+                                <form method="POST"
+                                      action="{{ url_for('excluir_contato', id=contato.id) }}"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Tem certeza de que deseja excluir este contato?');">
+                                    <button type="submit"
+                                            class="btn btn-outline-danger btn-sm"
+                                            aria-label="Excluir contato {{ contato.nome }}">
+                                        Excluir
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">
+                                Nenhum contato cadastrado ainda. Use o formulário para cadastrar o primeiro.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

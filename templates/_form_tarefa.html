@@ -1,0 +1,54 @@
+{% set opcoes_prioridade = ['Baixa', 'Média', 'Alta'] %}
+{% set opcoes_status = ['A fazer', 'Fazendo', 'Concluída'] %}
+{% set lista_contatos = contatos | list %}
+{% set contato_atual = tarefa.contato_id if tarefa else none %}
+{% set prioridade_atual = tarefa.prioridade if tarefa else 'Média' %}
+{% set status_atual = tarefa.status if tarefa else 'A fazer' %}
+{% set prazo_valor = (tarefa.prazo.strftime('%Y-%m-%d') if tarefa.prazo.strftime is defined else tarefa.prazo) if tarefa and tarefa.prazo else '' %}
+
+<div class="row g-3">
+    <div class="col-12">
+        <label for="descricao" class="form-label">Descrição <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="descricao" name="descricao"
+               placeholder="Ex: Escrever o README" maxlength="255"
+               value="{{ tarefa.descricao if tarefa else '' }}" required>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+        <label for="contato_id" class="form-label">Responsável <span class="text-danger">*</span></label>
+        <select class="form-select" id="contato_id" name="contato_id" required>
+            <option value="" disabled{% if not contato_atual %} selected{% endif %}>Selecione um contato</option>
+            {% for contato in lista_contatos %}
+            <option value="{{ contato.id }}"{% if contato.id == contato_atual %} selected{% endif %}>{{ contato.nome }}</option>
+            {% endfor %}
+        </select>
+        {% if not lista_contatos %}
+        <div class="form-text text-danger">
+            Nenhum contato cadastrado. <a href="/contatos">Cadastre um contato</a> antes de criar tarefas.
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+        <label for="prazo" class="form-label">Prazo <span class="text-danger">*</span></label>
+        <input type="date" class="form-control" id="prazo" name="prazo" value="{{ prazo_valor }}" required>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+        <label for="prioridade" class="form-label">Prioridade <span class="text-danger">*</span></label>
+        <select class="form-select" id="prioridade" name="prioridade" required>
+            {% for opcao in opcoes_prioridade %}
+            <option value="{{ opcao }}"{% if prioridade_atual == opcao %} selected{% endif %}>{{ opcao }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+        <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+        <select class="form-select" id="status" name="status" required>
+            {% for opcao in opcoes_status %}
+            <option value="{{ opcao }}"{% if status_atual == opcao %} selected{% endif %}>{{ opcao }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
