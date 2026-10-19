@@ -122,5 +122,4 @@ O Bootstrap 5.3.0 é carregado por CDN, enquanto o SQLite é utilizado para pers
 
 ## Contexto acadêmico
 
-Projeto colaborativo desenvolvido para praticar desenvolvimento web, persistência de dados, organização de funcionalidades e uso do Git em equipe, realizado como parte da disciplina Fundamentos de Sistemas de Informações.
 Este projeto colaborativo foi desenvolvido com o objetivo de proporcionar aos participantes a oportunidade de praticar e consolidar conhecimentos relacionados ao desenvolvimento web, à persistência de dados e à organização de funcionalidades, além de estimular o uso do Git em equipe como ferramenta essencial para o controle de versões e a integração de trabalhos. A iniciativa, realizada em grupo, busca não apenas exercitar aspectos técnicos, mas também promover a experiência de trabalho colaborativo e a vivência de metodologias de desenvolvimento. Este trabalho integra as atividades da disciplina Fundamentos de Sistemas de Informações, contribuindo para a formação prática e teórica dos estudantes na área de tecnologia da informação.
