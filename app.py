@@ -34,7 +34,7 @@ with app.app_context():
 
 
 # ==========================================
-# MODELO CONTATO
+# MODELO DE CONTATO
 # ==========================================
 class Contato(db.Model):
     __tablename__ = 'contatos'
